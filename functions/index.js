@@ -102,10 +102,10 @@ async function processCommand(message, id) {
 
     let reply = '';
 
-    for (let i = 0; i < result.docs.length; i++) {
+    for (let i = result.docs.length - 1; i > -1; i--) {
         let data = result.docs[i].data();
         reply = reply.concat(data.message);
-        if (i != result.docs.length - 1) {
+        if (i != 0) {
             reply = reply.concat('\n\n------------\n\n');
         }
     }
