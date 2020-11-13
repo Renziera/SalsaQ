@@ -43,16 +43,18 @@ async function handleEvent(event) {
     }
 
     let message = event.message.text;
-
+    
     if (isCommand(message)) {
         let reply = await processCommand(message, id);
         let data = { type: 'text', text: reply };
         return client.replyMessage(event.replyToken, data);
     }
-
+    let userData = await client.getProfile(event.source.userId)
     await db.collection('chatrooms').doc(id).collection('chats').add({
         message: message,
         timestamp: timestamp,
+        pengirim : userData.displayName,
+        userid : userData.userId,
         waktu: admin.firestore.FieldValue.serverTimestamp(),
     });
 
