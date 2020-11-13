@@ -29,7 +29,7 @@ async function handleEvent(event) {
 
     let timestamp = event.timestamp;
     let id = '';
-
+    let userId = event.source.userId;
     switch (event.source.type) {
         case 'user':
             id = event.source.userId;
@@ -43,16 +43,29 @@ async function handleEvent(event) {
     }
 
     let message = event.message.text;
-
+    
     if (isCommand(message)) {
         let reply = await processCommand(message, id);
         let data = { type: 'text', text: reply };
         return client.replyMessage(event.replyToken, data);
     }
-
+    let userData;
+    switch (event.source.type) {
+        case 'user':
+            userData = await client.getProfile(userId)
+            break;
+        case 'group':
+            userData = await client.getGroupMemberProfile(id,userId)
+            break;
+        case 'room':
+            userData = await client.getRoomMemberProfile(id,userId)
+            break;
+    }
     await db.collection('chatrooms').doc(id).collection('chats').add({
         message: message,
         timestamp: timestamp,
+        pengirim : userData.displayName,
+        userid : userData.userId,
         waktu: admin.firestore.FieldValue.serverTimestamp(),
     });
 
